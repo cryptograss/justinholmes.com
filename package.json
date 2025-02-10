@@ -5,8 +5,8 @@
   "scripts": {
     "download-videos": "node src/build_logic/download_videos.js",
     "build": "webpack --config src/build_logic/webpack.prod.js",
-    "dev:jh": "SKIP_CHAIN_DATA=true NODE_ENV=development webpack serve --config src/build_logic/webpack.justinholmes.dev.js",
-    "dev:cg": "SKIP_CHAIN_DATA=true NODE_ENV=development webpack serve --config src/build_logic/webpack.cryptograss.dev.js",
+    "dev:jh": "NODE_ENV=development webpack serve --config src/build_logic/webpack.justinholmes.dev.js",
+    "dev:cg": "NODE_ENV=development webpack serve --config src/build_logic/webpack.cryptograss.dev.js",
     "seed-dice": "node src/build_logic/seed_phrase_dice.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "debug-discord-fetcher": "node src/build_logic/debug_discord_fetcher.js",
