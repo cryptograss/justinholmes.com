@@ -203,7 +203,7 @@ export const runPrimaryBuild = async () => {
 
     });
 
-    console.timeEnd('pages-yaml-read');
+    console.timeEnd('One Off Pages');
 
     ///////////////////////////////////////////
     // Chapter 4: Factory pages (individual shows, songs, etc)  and JSON files
@@ -368,7 +368,52 @@ export const runPrimaryBuild = async () => {
     }
 
     ///////////////////////////
-    // Chapter 5: Cleanup
+    // Chapter 5: Happenings
+    ///////////////////////////
+
+    // Iterate though files in data/happenings
+    let happenings = {};
+    fs.readdirSync(path.resolve(dataDir, 'happenings')).forEach(file => {
+        const fileContents = fs.readFileSync(path.join(dataDir, 'happenings', file), 'utf8');
+        const yamlData = yaml.load(fileContents);
+        happenings[file.replace(/\.yaml$/, '')] = yamlData;
+    });
+
+    // Find MD file, render the MD therein, and add it as "body" to the happening.
+    for (let [happening_slug, happening_data] of Object.entries(happenings)) {
+        const md_path = path.resolve(dataDir, 'happenings', `${happening_slug}.md`);
+        if (fs.existsSync(md_path)) {
+            const md_contents = fs.readFileSync(md_path, 'utf8');
+            happening_data.body = marked(md_contents);
+        }
+    }
+
+    // Render cryptograss.live happenings - TODO: move this to secondary builder.
+
+    // First, all the happenings to the news page (TODO: paginate this?)
+    renderPage({
+        template_path: 'pages/happenings.njk',
+        output_path: `happenings.html`,
+        site: site,
+        context: {
+            happenings: happenings,
+            site: site,
+        }
+    });
+
+    for (let [happening_slug, happening_data] of Object.entries(happenings)) {
+        renderPage({
+            template_path: 'reuse/single-happening.njk',
+            output_path: `happenings/${happening_slug}.html`,
+            context: happening_data,
+            site: site,
+        }
+        );
+    }
+
+
+    ///////////////////////////
+    // Chapter 6: Cleanup
     ///////////////////////////
 
     // Warn about each unused image.
